@@ -1,4 +1,0 @@
-##Note for security reasons account id is shown as xxxxxx
-
-docker build --tag xxxxxx.dkr.ecr.us-east-2.amazonaws.com/aws-ip-manager:0.1 .
-docker push xxxxxxx.dkr.ecr.us-east-2.amazonaws.com/aws-ip-manager:0.1
