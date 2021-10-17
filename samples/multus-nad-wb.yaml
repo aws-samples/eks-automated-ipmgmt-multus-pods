@@ -1,0 +1,26 @@
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: ipvlan-multus
+  namespace: multus
+  
+spec:
+  config: '{
+      "cniVersion": "0.3.0",
+      "type": "ipvlan",
+      "master": "eth1",
+      "mode": "l3", 
+      "ipam": {
+        "type": "whereabouts",
+        "datastore": "kubernetes",
+        "kubernetes": { "kubeconfig": "/etc/cni/net.d/whereabouts.d/whereabouts.kubeconfig" },
+        "range": "10.10.1.80-10.10.1.82/24",
+        "routes": [
+            { "dst": "10.10.10.48/32" }
+          ],
+        "log_file" : "/tmp/whereabouts.log",
+        "log_level" : "debug",
+        "gateway": "10.10.1.1"
+      }
+    }'
+
