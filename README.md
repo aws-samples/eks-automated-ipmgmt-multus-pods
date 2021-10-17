@@ -6,7 +6,7 @@ For multus pods on EKS, primary pod interface is managed by VPC CNI, however sec
 ### Problem:
 VPC provides Layer 3 networking, which means only IP address can be used to communicate with one another, Besides that It also maintains coupling of MAC and associated IP addresses to route the traffic to correct ENI (Elastic Network interface), Each ENI attached to EC2 Worker node, needs to have the desired IP address(es) assigned to it.
 Since, Multus pods are using ipvlan CNI, which means that the macaddress of the pod remains same as the master interface (In this example its eth1). However, vpc will not be aware of the assumed IP address of the pod, since the IP allocations to these pods hasn’t happened via VPC. VPC is only aware of the IP addresses allocated on the ENI on EC2 worker nodes.
-Note: This can be verified on the EC2 console → Instances→ Select Instance (worker)→ Actions → Networking → Manage IP Addresses. You wouldnt see the multus secondary pod IP adresses on the ENI
+Note: This can be verified on the EC2 console → Instances→ Select Instance (worker)→ Actions → Networking → Manage IP Addresses. You wouldnt see the multus secondary pod IP adresses on the ENI.
 
 ### Automated solution:
 Assignment of the can be automated by using assign ip address/unassign ip address API calls on the worker node ENIs.  
@@ -18,11 +18,9 @@ Clone this repo:
 
 ```
 git clone https://github.com/aws-samples/eks-automated-ipmgmt-multus-pods
-cd code
 ```
 Please replace the xxxxxxxxx with your accout id and also choose the region where your ECR repository is.
 
-```
 
 ```
 $ docker build --tag xxxxxxxxx.dkr.ecr.us-east-2.amazonaws.com/aws-ip-manager:0.1 .
@@ -149,6 +147,7 @@ $
 ```
 $ kubectl create ns multus
 $ kubectl delete -f busybox-deployment-sidecar.yaml
+$ kubectl delete -f busybox-deployment-initContainer.yaml
 $ kubectl delete -f multus-nad-wb.yaml
 $ kubectl delete ns multus
 ```
