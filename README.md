@@ -12,6 +12,14 @@ Note: This can be verified on the EC2 console → Instances→ Select Instance (
 Assignment of the can be automated by using assign ip address/unassign ip address API calls on the worker node ENIs.  
 The python code and script in the "code" directory on this repo can achieve the same. This automation can be managed and still be done by without modifying the application image or adding any additional source code change. We can leverage the flexible container architecture of a kubernetes pod and get this solved by utilizing an “ip management container”. This special container can perform the automation of the IP allocation on the respective worker Node ENIs, without any impact on applications containers or its architecture. We can just enhance the spec of the workload pod/deployment/statefulset with this additional container.
 
+#### Pre-requisite
+
+1. EKS cluster
+2. Self managed nodegroup (minimum 2 workers) with secondary ENIs 
+3. Security group on the worker nodes have ICMP traffic allowed between worker nodes
+4. multus CNI (along with ipvlan CNI) 
+5. whereabouts IPAM CNI
+
 #### How to Build
 
 Clone this repo:
@@ -23,10 +31,10 @@ Please replace the xxxxxxxxx with your accout id and also choose the region wher
 
 
 ```
-$ docker build --tag xxxxxxxxx.dkr.ecr.us-east-2.amazonaws.com/aws-ip-manager:0.1 .
-$ aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin xxxxxxxxx.dkr.ecr.us-east-2.amazonaws.com
-$ aws ecr create-repository --repository-name aws-ip-manager --region us-east-2
-$ docker push xxxxxxxxx.dkr.ecr.us-east-2.amazonaws.com/aws-ip-manager:0.1
+docker build --tag xxxxxxxxx.dkr.ecr.us-east-2.amazonaws.com/aws-ip-manager:0.1 .
+aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin xxxxxxxxx.dkr.ecr.us-east-2.amazonaws.com
+aws ecr create-repository --repository-name aws-ip-manager --region us-east-2
+docker push xxxxxxxxx.dkr.ecr.us-east-2.amazonaws.com/aws-ip-manager:0.1
 ```
 
 ####  Option 1: InitContainer IP management Solution
@@ -48,9 +56,8 @@ $ kubectl create ns multus
 namespace/multus created
 $ kubectl apply -f multus-nad-wb.yaml
 networkattachmentdefinition.k8s.cni.cncf.io/ipvlan-multus created
-$ kubectl apply -f busybox-deployment-sidecar.yaml
-deployment.apps/busybox-deployment created
 $ kubectl apply -f busybox-deployment-initContainer.yaml
+deployment.apps/busybox-deployment created
 $ kubectl -n multus get po -o wide
 NAME                                  READY   STATUS    RESTARTS   AGE   IP             NODE                                         NOMINATED NODE   READINESS GATES
 busybox-deployment-7676bf4bb7-45f7z   1/1     Running   0          19s   10.10.12.12    ip-10-10-12-248.us-east-2.compute.internal   <none>           <none>
