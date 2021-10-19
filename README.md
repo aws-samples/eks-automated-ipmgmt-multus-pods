@@ -19,6 +19,7 @@ The python code and script in the "code" directory on this repo can achieve the 
 3. Security group on the worker nodes have ICMP traffic allowed between worker nodes
 4. multus CNI (along with ipvlan CNI) 
 5. whereabouts IPAM CNI
+6. Bastion node with docker and git
 
 #### How to Build
 
