@@ -42,7 +42,7 @@ To use this option, we need to add this snippet in your workloads (use your acco
         imagePullPolicy: IfNotPresent
         args: [/bin/sh, -c, '/app/script.sh initContainers']  
 
-Deploy the sample pod for initContainer in samples direcory and test it
+Deploy the sample pod for initContainer in samples direcory, use your account number in place of xxxxxxxxx, and test it. 
 ```
 $ kubectl create ns multus
 namespace/multus created
@@ -94,7 +94,7 @@ In this case the sidecar keeps running and monitoring the pod, so there is addit
         imagePullPolicy: Always
         args: [/bin/sh, -c, '/app/script.sh sidecar']
 
-Deploy the sample pod for sidecar solutions in samples direcory and test it
+Deploy the sample pod for sidecar solutions in samples direcory,use your account number in place of xxxxxxxxx and test it
 ```
 $ kubectl create ns multus
 namespace/multus created
