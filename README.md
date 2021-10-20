@@ -15,7 +15,7 @@ The python code and script in the "code" directory on this repo can achieve the 
 #### Pre-requisite
 
 1. EKS cluster
-2. Self managed nodegroup (minimum 2 workers) with secondary ENIs 
+2. Self managed nodegroup (minimum 2 workers) with secondary ENIs with desired IAM role & [IAM policy](samples/iam-policy.json).
 3. Security group on the worker nodes have ICMP traffic allowed between worker nodes
 4. multus CNI (along with ipvlan CNI) 
 5. whereabouts IPAM CNI
