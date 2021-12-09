@@ -9,7 +9,7 @@ spec:
       "cniVersion": "0.3.0",
       "type": "ipvlan",
       "master": "eth1",
-      "mode": "l3", 
+      "mode": "l2", 
       "ipam": {
         "type": "whereabouts",
         "datastore": "kubernetes",
