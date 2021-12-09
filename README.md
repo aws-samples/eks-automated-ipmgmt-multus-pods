@@ -5,7 +5,9 @@ For multus pods on EKS, primary pod interface is managed by VPC CNI, however sec
 
 ### Problem:
 VPC provides Layer 3 networking, which means only IP address can be used to communicate with one another, Besides that It also maintains coupling of MAC and associated IP addresses to route the traffic to correct ENI (Elastic Network interface), Each ENI attached to EC2 Worker node, needs to have the desired IP address(es) assigned to it.
+
 Since, Multus pods are using ipvlan CNI, which means that the macaddress of the pod remains same as the master interface (In this example its eth1). However, vpc will not be aware of the assumed IP address of the pod, since the IP allocations to these pods hasn’t happened via VPC. VPC is only aware of the IP addresses allocated on the ENI on EC2 worker nodes.
+
 Note: This can be verified on the EC2 console → Instances→ Select Instance (worker)→ Actions → Networking → Manage IP Addresses. You wouldnt see the multus secondary pod IP adresses on the ENI.
 
 ### Automated solution:
