@@ -64,8 +64,13 @@ def assign_ip6_to_nic(ip6List,network_interface_id,client):
         Ipv6Addresses=ip6List,
         NetworkInterfaceId=network_interface_id,
         )
+## This function gets the metadata token
+def get_metadata_token():
+    token_url="http://169.254.169.254/latest/api/token"
+    headers = {'X-aws-ec2-metadata-token-ttl-seconds': '21600'}
+    r= requests.put(token_url,headers=headers,timeout=(2, 5))
+    return r.text
 
-## This function reads the instanceID and region from metadata URI from the worker node
 def get_instance_id():
     instance_identity_url = "http://169.254.169.254/latest/dynamic/instance-identity/document"
     session = requests.Session()
@@ -74,15 +79,25 @@ def get_instance_id():
     session.mount("http://169.254.169.254/", metadata_adapter)
     try:
         r = requests.get(instance_identity_url, timeout=(2, 5))
+        code=r.status_code
+        if code == 401: ###This node has IMDSv2 enabled, hence unauthorzied, we need to get token first and use the token
+            tprint("node has IMDSv2 enabled!! Fetching Token first")
+            token=get_metadata_token()
+            headers = {'X-aws-ec2-metadata-token': token}
+            r = requests.get(instance_identity_url, headers=headers, timeout=(2, 5))
+            code=r.status_code
+        if code == 200:
+            response_json = r.json()
+            instanceid = response_json.get("instanceId")
+            region = response_json.get("region")
+            return(instanceid,region)
     except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError) as err:
         tprint("Execption: Connection to AWS EC2 Metadata timed out: " + str(err.__class__.__name__))
         tprint("Execption: Is this an EC2 instance? Is the AWS metadata endpoint blocked? (http://169.254.169.254/)")
         raise
-    response_json = r.json()
-    instanceid = response_json.get("instanceId")
-    region = response_json.get("region")
-    return(instanceid,region)
-
+    except Exception as e:
+        tprint("Execption: caught exception " + str(e.__class__.__name__))
+        raise             
 ## This function runs the shell command and returns the command output
 def shell_run_cmd(cmd,retCode=0):
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,encoding="utf-8")
@@ -214,4 +229,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
