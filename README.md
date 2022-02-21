@@ -163,7 +163,7 @@ $ kubectl delete ns multus
 ```
 ## Conclusion
 
-In this blog post, we covered how mulltus pods work in EKS and VPC scope. We demonstrated the deployment of multus based pods and discussed in detail, how IP allocation of these pods works and how they interact with Worker  and VPC networking. This blog only demonstrated the IPv4 handling, however in similar way, IPv6 handling is also present in the sample code.  
+In this blog post, we covered how mulltus pods work in EKS and VPC scope. We demonstrated the deployment of multus based pods and discussed in detail, how IP allocation of these pods works and how they interact with Worker  and VPC networking. This blog only demonstrated the IPv4 handling, however in similar way, IPv6 handling is also present in the sample code. The container code supports both IMDSv1 and IMDSv2.
 
 This solution might not be applicable for all the use cases or application requirements, so this code or the process shall be considered as sample  and can be enhanced/adapted per the different unique application architecture and use cases. 
 
