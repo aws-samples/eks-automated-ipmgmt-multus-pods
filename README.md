@@ -22,8 +22,7 @@ The python code and script in the "code" directory on this repo can achieve the 
 4. multus CNI (along with ipvlan CNI) 
 5. whereabouts IPAM CNI
 6. Bastion node with docker and git
-
-Note: If you are using the IMDSv2 enabled, then ensure that nodes have HttpPutResponseHopLimit as 2. Please refer to [Configure the instance metadata options](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-options.html).    
+7. HttpPutResponseHopLimit as 2 (If you are using the IMDSv2 enabled). Please refer to [Configure the instance metadata options](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-options.html).    
 
 
 #### How to Build
