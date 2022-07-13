@@ -45,7 +45,10 @@ docker push xxxxxxxxx.dkr.ecr.us-east-2.amazonaws.com/aws-ip-manager:0.1
 ####  Option 1: InitContainer IP management Solution
 
 This is a simple solution and works for most of the ipvlan CNI pods, which don’t have a special/custom handling like floating IP etc. (explained in next option). This solution doesn’t add a constraint of additional cpu/memory requirement on the worker.
-In this solution as the name suggests the “ip management container” is deployed as initContainer of the kubernetes workload. This container would be executed as first container while the POD is in init mode.  This container will check the ip address of the pod (ip a command) & allocate the multus ip addresses to the ENI, while the pod is in init state. Once the multus IP addresses are successfully assigned to the worker node ENIs, this initContainer will terminate and pod will come out of the init state. All other containers will start coming up and would be ready to serve traffic, as IP assignment has already taken place. Whenever a pod restarts or gets deployed on a new worker node, the entire life cycle of the pod repeats, including the initContainer, thereby taking care of the IP address assignment on the respective ENI.
+
+In this solution as the name suggests the “ip management container” is deployed as initContainer of the kubernetes workload. This container would be executed as first container while the POD is in init mode.  This container will check the ip address of the pod (ip a command) & allocate the multus ip addresses to the ENI, while the pod is in init state. 
+
+Once the multus IP addresses are successfully assigned to the worker node ENIs, this initContainer will terminate and pod will come out of the init state. All other containers will start coming up and would be ready to serve traffic, as IP assignment has already taken place. Whenever a pod restarts or gets deployed on a new worker node, the entire life cycle of the pod repeats, including the initContainer, thereby taking care of the IP address assignment on the respective ENI.
 
 To use this option, we need to add this snippet in your workloads (use your account number in place of xxxxxxxxx), whether its a simple pod, daemonset or any replicaset based workload (deployment or statefulset).
 
@@ -96,7 +99,9 @@ $
 ```
 #### Option 2: Sidecar IP management Solution
 
-Sidecar IP management container, as the name indicates, will be running as an additional or sidecar container and unlike the initContainer, it keeps on monitoring the pod for new or change in ip addresses and if there is any update/change noticed, it will assign the IPs to the ENI, thereby minimizing the traffic impact. This is very helpful, when the pod has some custom handling, where the IP address can change or it has a handing of “Floating IP”/“Virtual IP”. A usecase could be, where the pods are running in active/standby mode and, if a pod crashes or has any issues, the “Floating IP”/“Virtual IP” address can fail over to other pod, without any traffic disruption and maintaining the single-entry point.
+Sidecar IP management container, as the name indicates, will be running as an additional or sidecar container and unlike the initContainer, it keeps on monitoring the pod for new or change in ip addresses and if there is any update/change noticed, it will assign the IPs to the ENI, thereby minimizing the traffic impact. This is very helpful, when the pod has some custom handling, where the IP address can change or it has a handing of “Floating IP”/“Virtual IP”. 
+
+A usecase could be, where the pods are running in active/standby mode and, if a pod crashes or has any issues, the “Floating IP”/“Virtual IP” address can fail over to other pod, without any traffic disruption and maintaining the single-entry point.
 
 In this case the sidecar keeps running and monitoring the pod, so there is additional usage of the CPU/Memory (minimal) of this container, per multus based pods. (use your account number in place of xxxxxxxxx) in below example
 
