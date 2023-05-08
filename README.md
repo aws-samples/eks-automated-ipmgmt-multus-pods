@@ -1,7 +1,7 @@
 
 ## Automated Multus pod IP management on EKS
 
-For multus pods on EKS, primary pod interface is managed by VPC CNI, however secondary interfaces are managed by other CNIs like ipvlan and different ipams like "host-local" , "static" or "whereabouts" via multus meta-plugin. To make these secondary interfaces IPs routable in VPC network, the IP allocation needs to be done manually on the worker node ENI, handling the master interface for the multus network attachment. This blog explains the procedure of automating this IP allocation seamlessly, without any change in application code.   
+For multus pods on EKS, primary pod interface is managed by VPC CNI, however secondary interfaces are managed by other CNIs like ipvlan and different ipams like "host-local" , "static" or "whereabouts" via multus meta-plugin. To make these secondary interfaces IPs routable in VPC network, the IP allocation needs to be done manually on the worker node ENI, handling the master interface for the multus network attachment. This blog explains the procedure of automating this IP allocation seamlessly, without any change in application code. Please refer to the [blog](https://aws.amazon.com/blogs/industries/automated-ip-address-management-for-multus-workers-and-pods/) for overall IP management for the Multus workloads and nodegroup.
 
 ### Problem:
 VPC provides Layer 3 networking i.e. using IP protocol. Each ENI attached to EC2 Worker node, needs to have the desired IP address(es) assigned to it.
