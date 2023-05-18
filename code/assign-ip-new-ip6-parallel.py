@@ -92,8 +92,8 @@ def get_instance_id():
             region = response_json.get("region")
             return(instanceid,region)
     except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError) as err:
-        tprint("Execption: Connection to AWS EC2 Metadata timed out: " + str(err.__class__.__name__))
-        tprint("Execption: Is this an EC2 instance? Is the AWS metadata endpoint blocked? (http://169.254.169.254/)")
+        tprint("Exception: Connection to AWS EC2 Metadata timed out: " + str(err.__class__.__name__))
+        tprint("Exception: Is this an EC2 instance? Is the AWS metadata endpoint blocked? (http://169.254.169.254/)")
         raise
     except Exception as e:
         tprint("Execption: caught exception " + str(e.__class__.__name__))
@@ -108,14 +108,20 @@ def shell_run_cmd(cmd,retCode=0):
 ## This function fetches the subnet CIDR for the given subnet
 # All exceptions handled in the main function
 def get_subnet_cidr(ec2_client,subnetId):
+    CidrBlock, Ipv6CidrBlock = "", ""
     response = ec2_client.describe_subnets(
         SubnetIds=[
             subnetId,
         ],    
     )
     for i in response['Subnets']:
-        CidrBlock = i['CidrBlock']
-    return  CidrBlock
+        if "Ipv6CidrBlockAssociationSet" in i:
+            for ipv6_cidr_block in i['Ipv6CidrBlockAssociationSet']:
+                Ipv6CidrBlock = ipv6_cidr_block['Ipv6CidrBlock']
+        if "CidrBlock" in i and not any('CidrBlock' in j for j in i.get('Ipv6CidrBlockAssociationSet', [])):
+            CidrBlock = i['CidrBlock']
+    return CidrBlock, Ipv6CidrBlock
+
 
 ## This function collects the details of each ENI attached to the worker node and corrresponding subnet IDs
 # later it fetches the subnetCIDR for the given subnet ID and stores them in a Dictionary where key is the CidrBlock and value is the ENI id
@@ -127,9 +133,13 @@ def get_instanceDetails(ec2_client,instance_id,instanceData):
     for r in response['Reservations']:
       for i in r['Instances']:
         for j in i["NetworkInterfaces"]:
-            cidrBlock = get_subnet_cidr(ec2_client,j["SubnetId"])
-            instanceData[cidrBlock] = j["NetworkInterfaceId"]
-            tprint("Node ENIC: "+ j["NetworkInterfaceId"] + " cidr: " + cidrBlock  + " subnetID: " + j["SubnetId"])
+            cidrBlock, ipv6CidrBlock = get_subnet_cidr(ec2_client,j["SubnetId"])
+            if len(cidrBlock) > 0:
+                instanceData[cidrBlock] = j["NetworkInterfaceId"]
+                tprint("Node ENIC: "+ j["NetworkInterfaceId"] + " Ipv4 cidr: " + cidrBlock  + " subnetID: " + j["SubnetId"])
+            if len(ipv6CidrBlock) > 0:
+                instanceData[ipv6CidrBlock] = j["NetworkInterfaceId"]
+                tprint("Node ENIC: "+ j["NetworkInterfaceId"] + " Ipv6 cidr: " + ipv6CidrBlock  + " subnetID: " + j["SubnetId"])
 
 def main():    
     instance_id = None
