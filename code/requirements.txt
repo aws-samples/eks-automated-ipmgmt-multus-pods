@@ -1,3 +1,4 @@
+urllib3==1.26.11
 netaddr
 boto3
 requests
