@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 FROM public.ecr.aws/amazonlinux/amazonlinux:latest
 WORKDIR /app
-RUN yum -y install python3
+RUN yum -y install python3 python3-pip
 RUN yum -y install iproute
 COPY requirements.txt requirements.txt
 COPY script.sh script.sh
