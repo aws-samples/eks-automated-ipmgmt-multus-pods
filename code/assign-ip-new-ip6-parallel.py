@@ -186,10 +186,14 @@ def main():
                         if ipaddress not in currIPList:
                             ip = IPNetwork(ipaddress)
                             cidr = str(ip.cidr) 
-                            if  netaddr.valid_ipv4(str(ip.ip)):    
-                                ipmap[cidr].append(str(ip.ip))
-                            else :
-                                ip6map[cidr].append(str(ip.ip))
+                            if cidr in instanceData: ## if cidr on the pod matches with subnet cidrs attached to worker node
+                                if  netaddr.valid_ipv4(str(ip.ip)):
+                                    ipmap[cidr].append(str(ip.ip))
+                                else :
+                                    ip6map[cidr].append(str(ip.ip))
+                                tprint("pod ip address: " + ipaddress + " cidr: " + cidr + " matches with attached worker node subnet cidrs. will be processed for secondary ip assignment")
+                            else:
+                                tprint("pod ip address: " + ipaddress + " cidr: " + cidr +  " doesnt match with any of the worker node subnet cidrs. Skipping secondary ip assignment!!!")
                             noChange=False 
                     # if there are changes in the ips (new vs old) then reassign the ipv4 IP addresses asynchronously to save time  (parallel execution)  
                     if noChange == False :  
