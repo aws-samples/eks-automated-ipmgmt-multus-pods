@@ -133,13 +133,17 @@ def get_instanceDetails(ec2_client,instance_id,instanceData):
     for r in response['Reservations']:
       for i in r['Instances']:
         for j in i["NetworkInterfaces"]:
-            cidrBlock, ipv6CidrBlock = get_subnet_cidr(ec2_client,j["SubnetId"])
-            if len(cidrBlock) > 0:
-                instanceData[cidrBlock] = j["NetworkInterfaceId"]
-                tprint("Node ENIC: "+ j["NetworkInterfaceId"] + " Ipv4 cidr: " + cidrBlock  + " subnetID: " + j["SubnetId"])
-            if len(ipv6CidrBlock) > 0:
-                instanceData[ipv6CidrBlock] = j["NetworkInterfaceId"]
-                tprint("Node ENIC: "+ j["NetworkInterfaceId"] + " Ipv6 cidr: " + ipv6CidrBlock  + " subnetID: " + j["SubnetId"])
+            ##skip eth0 interface addition in the decideData collection
+            if j['Attachment']['DeviceIndex'] !=0:
+                cidrBlock, ipv6CidrBlock = get_subnet_cidr(ec2_client,j["SubnetId"])
+                if len(cidrBlock) > 0:
+                    instanceData[cidrBlock] = j["NetworkInterfaceId"]
+                    tprint("Node ENIC: "+ j["NetworkInterfaceId"] + " Ipv4 cidr: " + cidrBlock  + " subnetID: " + j["SubnetId"])
+                if len(ipv6CidrBlock) > 0:
+                    instanceData[ipv6CidrBlock] = j["NetworkInterfaceId"]
+                    tprint("Node ENIC: "+ j["NetworkInterfaceId"] + " Ipv6 cidr: " + ipv6CidrBlock  + " subnetID: " + j["SubnetId"])
+            else:
+                tprint("skipping eth0 (device index 0 ) ENI: " + j["NetworkInterfaceId"] )
 
 def main():    
     instance_id = None
