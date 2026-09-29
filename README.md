@@ -162,7 +162,6 @@ $
 ```
 ## Cleanup
 ```
-$ kubectl create ns multus
 $ kubectl delete -f busybox-deployment-sidecar.yaml
 $ kubectl delete -f busybox-deployment-initContainer.yaml
 $ kubectl delete -f multus-nad-wb.yaml
